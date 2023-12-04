@@ -11,4 +11,4 @@ class Post(models.Model):
     publication_date = models.DateField(auto_now_add=True)
     image_url = models.URLField()
     content = models.CharField(max_length=200)
-    categories = models.ManyToManyField("Category", through="CategoryTag", related_name="posts")
+    categories = models.ManyToManyField("Category", through="postCategory", related_name="posts")
