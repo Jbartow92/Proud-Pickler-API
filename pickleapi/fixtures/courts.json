@@ -1,0 +1,20 @@
+[
+    {
+      "model": "pickleapi.court",
+      "pk": 1,
+      "fields": {
+        "title": "1st court",
+        "city": "Nashville",
+        "state": "TN",
+        "number_of_courts": 10,
+        "open_hours": "9am - 6pm",
+        "court_image_url": "http://first.com"
+      }
+    }
+  ]
+  
+  
+  
+  
+  
+  

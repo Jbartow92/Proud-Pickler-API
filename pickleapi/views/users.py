@@ -27,6 +27,22 @@ class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
 
+    @action(detail=False, methods=["get"], url_path="pickleusers")
+    def get_pickle_users(self, request):
+        # Ensure the user is authenticated
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Filter PickleUser objects for the current authenticated user
+        pickle_user = PickleUser.objects.filter(user=request.user).first()
+
+        # Check if the PickleUser exists
+        if pickle_user:
+            serializer = PickleUserSerializer(pickle_user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "PickleUser not found"}, status=status.HTTP_404_NOT_FOUND)
+
     @action(detail=False, methods=["post"], url_path="register")
     def register_account(self, request):
         serializer = UserSerializer(data=request.data)
@@ -38,14 +54,16 @@ class UserViewSet(viewsets.ViewSet):
                 last_name=serializer.validated_data["last_name"],
                 email=serializer.validated_data["username"],
             )
-            pickle_user = PickleUser.objects.create(
-                user=user,
-                profile_image_url= request.data.get("profile_image_url"),
-                bio= request.data.get("bio"),
-            )
+            # Create or update PickleUser associated with the user
+            pickle_user, created = PickleUser.objects.get_or_create(user=user)
+            pickle_user.profile_image_url = request.data.get("profile_image_url")
+            pickle_user.bio = request.data.get("bio")
+            pickle_user.save()
+
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(detail=False, methods=["post"], url_path="login")
     def user_login(self, request):

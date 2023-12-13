@@ -1,0 +1,17 @@
+[
+    {
+      "model": "pickleapi.category",
+      "pk": 1,
+      "fields": {
+        "label": "Doubles"
+      }
+    },
+    {
+      "model": "pickleapi.category",
+      "pk": 2,
+      "fields": {
+        "label": "Singles"
+      }
+    }
+  ]
+  
