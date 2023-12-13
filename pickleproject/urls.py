@@ -9,9 +9,10 @@ from pickleapi.views import (
 )
 
 router = DefaultRouter(trailing_slash=False)
-router.register(r"posts", PostViewSet, "post")
-router.register(r"courts", CourtViewSet, "court")
-router.register(r"categories", CategoryViewSet, "category")
+router.register(r"posts", PostViewSet, basename="post")
+router.register(r"courts", CourtViewSet, basename="court")
+router.register(r"categories", CategoryViewSet, basename="category")
+router.register(r"users", UserViewSet, basename="user")
 
 urlpatterns = [
     path("", include(router.urls)),

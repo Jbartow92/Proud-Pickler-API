@@ -15,6 +15,7 @@ class CourtSerializer(serializers.ModelSerializer):
     class Meta:
         model = Court
         fields = [
+            "id",
             "title",
             "court_image_url",
             "city",

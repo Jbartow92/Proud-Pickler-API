@@ -1,4 +1,5 @@
 {
+    "python.pythonPath": "/home/josh/.local/share/virtualenvs/PickleProject-6hzF9ymm/bin/python",
     "pylint.args": [
         "--load-plugins=pylint_django",
         "--django-settings-module=pickleproject.settings",
