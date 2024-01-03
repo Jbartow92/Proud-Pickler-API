@@ -22,6 +22,8 @@ class SimplePostSerializer(serializers.ModelSerializer):
             "court",
         ]
 
+        extra_kwargs = {"image_url": {"required": False, "allow_blank": True}}
+
 class PostSerializer(serializers.ModelSerializer):
     pickle_user = PickleUserSerializer(many=False)
     is_owner = serializers.SerializerMethodField()
@@ -45,6 +47,8 @@ class PostSerializer(serializers.ModelSerializer):
             "is_owner",
         ]
 
+        extra_kwargs = {"image_url": {"required": False}}
+        
 class PostViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
