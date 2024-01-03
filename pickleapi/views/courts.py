@@ -1,17 +1,11 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import serializers
-from pickleapi.models import Court, PickleUser
+from pickleapi.models import Court
 from django.contrib.auth.models import User
 
 
 class CourtSerializer(serializers.ModelSerializer):
-    # is_owner = serializers.SerializerMethodField()
-
-    # def get_is_owner(self, obj):
-    #     # Check if the authenticated user is the owner
-    #     return self.context["request"].user == obj.pickle_user.user
-
     class Meta:
         model = Court
         fields = [
@@ -23,7 +17,14 @@ class CourtSerializer(serializers.ModelSerializer):
             "number_of_courts",
             "open_hours"
         ]
-
+        extra_kwargs = {
+            "title": {"required": True},
+            "court_image_url": {"required": True},
+            "city": {"required": True},
+            "state": {"required": True},
+            "number_of_courts": {"required": True},
+            "open_hours": {"required": True}
+        }
 
 
 class CourtViewSet(viewsets.ViewSet):
@@ -42,48 +43,21 @@ class CourtViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def create(self, request):
-        # Get the data from the client's JSON payload
-        title = request.data.get("title")
-        court_image_url = request.data.get("court_image_url")
-        city = request.data.get("city")
-        state = request.data.get("state")
-        number_of_courts = request.data.get("number_of_courts")
-        open_hours = request.data.get("open_hours")
+        serializer = CourtSerializer(data=request.data)
+        if serializer.is_valid():
+            court = serializer.save()
+            return Response(CourtSerializer(court, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
-        # Create a court database row first, so you have a
-        # primary key to work with
-        court = Court.objects.create(
-            title=title,
-            court_image_url=court_image_url,
-            city=city,
-            state=state,
-            number_of_courts=number_of_courts,
-            open_hours=open_hours
-        )
-
-        serializer = CourtSerializer(court, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
         try:
             court = Court.objects.get(pk=pk)
-
-            # Is the authenticated user allowed to edit this court?
             self.check_object_permissions(request, court)
 
-            serializer = CourtSerializer(data=request.data)
+            serializer = CourtSerializer(court, data=request.data)
             if serializer.is_valid():
-                # court.pickle_user = serializer.validated_data["pickle_user"]
-                court.title = serializer.validated_data["title"]
-                # court.publication_date = serializer.validated_data["publication_date"]
-                court.court_image_url = serializer.validated_data["court_image_url"]
-                court.city = serializer.validated_data["city"]
-                court.state = serializer.validated_data["state"]
-                court.number_of_courts = serializer.validated_data["number_of_courts"]
-                court.open_hours = serializer._validated_data["open_hours"]
-                court.save()
-
-                serializer = CourtSerializer(court, context={"request": request})
+                serializer.save()
                 return Response(None, status.HTTP_204_NO_CONTENT)
 
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
@@ -96,7 +70,6 @@ class CourtViewSet(viewsets.ViewSet):
             court = Court.objects.get(pk=pk)
             self.check_object_permissions(request, court)
             court.delete()
-
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         except Court.DoesNotExist:

@@ -8,7 +8,8 @@ from pickleapi.views import (
     CategoryViewSet
 )
 
-router = DefaultRouter(trailing_slash=False)
+router = DefaultRouter(trailing_slash=True)
+
 router.register(r"posts", PostViewSet, basename="post")
 router.register(r"courts", CourtViewSet, basename="court")
 router.register(r"categories", CategoryViewSet, basename="category")
